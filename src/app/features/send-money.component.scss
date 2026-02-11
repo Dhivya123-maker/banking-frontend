@@ -1,0 +1,276 @@
+.send-money-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-money-card {
+  width: 100%;
+  max-width: 600px;
+  
+  mat-card {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+}
+
+mat-card-header {
+  margin-bottom: 24px;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+
+    .back-button {
+      flex-shrink: 0;
+    }
+
+    .header-text {
+      flex: 1;
+    }
+  }
+
+  mat-card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+  }
+
+  mat-card-subtitle {
+    font-size: 14px;
+    color: #718096;
+  }
+}
+
+mat-card-content {
+  padding: 0 24px 24px;
+}
+
+// Balance Info Card
+.balance-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .balance-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .balance-label {
+      font-size: 12px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .balance-amount {
+      font-size: 28px;
+      font-weight: 700;
+    }
+  }
+}
+
+// Form Styles
+.send-money-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+ mat-form-field {
+    ::ng-deep {
+      span[matPrefix] {
+        margin-left: 10px;
+      }
+    }
+  }
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        background: #f7fafc;
+      }
+
+      .mat-mdc-form-field-focus-overlay {
+        background: transparent;
+      }
+
+      .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #e2e8f0;
+        }
+      }
+
+      .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #667eea;
+        }
+      }
+    }
+
+    mat-icon[matPrefix] {
+      color: #667eea;
+      margin-right: 8px;
+    }
+
+    mat-hint {
+      color: #718096;
+      font-size: 12px;
+    }
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+
+  button {
+    flex: 1;
+    height: 48px;
+    font-weight: 500;
+    font-size: 16px;
+    border-radius: 8px;
+    text-transform: none;
+    letter-spacing: 0.5px;
+  }
+
+  .cancel-button {
+    background: #f7fafc;
+    color: #4a5568;
+
+    &:hover:not([disabled]) {
+      background: #edf2f7;
+    }
+  }
+
+  .submit-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+
+    &:hover:not([disabled]) {
+      background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    &[disabled] {
+      background: #cbd5e0;
+      color: #a0aec0;
+    }
+
+    .button-spinner {
+      margin-right: 8px;
+      display: inline-block;
+      vertical-align: middle;
+
+      ::ng-deep circle {
+        stroke: white;
+      }
+    }
+  }
+}
+
+// Security Notice
+.security-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 12px;
+  background: #f0fdf4;
+  border-radius: 8px;
+  color: #166534;
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .send-money-container {
+    padding: 16px;
+  }
+
+  .send-money-card {
+    max-width: 100%;
+  }
+
+  mat-card-header {
+    mat-card-title {
+      font-size: 20px;
+    }
+  }
+
+  .balance-info {
+    padding: 16px;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .balance-text .balance-amount {
+      font-size: 24px;
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Snackbar Styles (Add to global styles.scss if not already there)
+::ng-deep {
+  .success-snackbar {
+    background: #10b981 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+
+  .error-snackbar {
+    background: #ef4444 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+}

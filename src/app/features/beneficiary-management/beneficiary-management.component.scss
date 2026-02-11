@@ -1,0 +1,487 @@
+.beneficiary-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+}
+
+.beneficiary-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  color: white;
+
+  .back-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .header-text {
+    flex: 1;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 4px 0 0;
+    }
+  }
+
+  .add-button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Add Form Card
+.add-form-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+
+  mat-card-header {
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .full-width {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+// Search and Filter
+.search-filter-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .search-field {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .filter-chips {
+    display: flex;
+    gap: 8px;
+
+    mat-chip-option {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// Favorites Section
+.favorites-section {
+  margin-bottom: 32px;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 20px;
+    margin-bottom: 16px;
+
+    mat-icon {
+      color: #fbbf24;
+    }
+  }
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.favorite-card {
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  .favorite-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .favorite-info {
+      flex: 1;
+
+      strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+
+      small {
+        opacity: 0.9;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .quick-send-button {
+    width: 100%;
+    background: white;
+    color: #667eea;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 12px;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #718096;
+  }
+}
+
+// Beneficiaries Section
+.beneficiaries-section {
+  h3 {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+}
+
+// No Beneficiaries
+.no-beneficiaries {
+  text-align: center;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 12px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #cbd5e0;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin: 0 0 8px;
+    color: #2d3748;
+  }
+
+  p {
+    color: #718096;
+    margin: 0 0 24px;
+  }
+}
+
+// Beneficiaries Grid
+.beneficiaries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.beneficiary-card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .beneficiary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+
+    .beneficiary-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex: 1;
+
+      .avatar-large {
+        mat-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          color: #667eea;
+        }
+      }
+
+      h4 {
+        font-size: 18px;
+        margin: 0 0 4px;
+        color: #2d3748;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0 0 4px;
+        color: #718096;
+      }
+
+      .type-chip {
+        font-size: 11px;
+        min-height: 24px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+      }
+    }
+
+    .favorite-active {
+      color: #fbbf24;
+    }
+  }
+
+  .beneficiary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+
+    .detail-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #718096;
+        margin-top: 2px;
+      }
+
+      div {
+        flex: 1;
+
+        small {
+          display: block;
+          font-size: 12px;
+          color: #a0aec0;
+          margin-bottom: 2px;
+        }
+
+        strong {
+          display: block;
+          font-size: 14px;
+          color: #2d3748;
+        }
+      }
+    }
+  }
+
+  .transaction-stats {
+    display: flex;
+    gap: 16px;
+    margin: 16px 0;
+    padding: 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+
+    .stat-item {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #667eea;
+      }
+
+      div {
+        small {
+          display: block;
+          font-size: 11px;
+          color: #a0aec0;
+        }
+
+        strong {
+          display: block;
+          font-size: 13px;
+          color: #2d3748;
+        }
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+
+    button[mat-raised-button] {
+      flex: 1;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .created-date {
+    margin-top: 12px;
+    text-align: center;
+
+    small {
+      font-size: 11px;
+      color: #a0aec0;
+    }
+  }
+
+  // Edit Form
+  .edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .beneficiary-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+
+    .header-text h1 {
+      font-size: 24px;
+    }
+
+    .add-button {
+      width: 100%;
+    }
+  }
+
+  .search-filter-section {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-field {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .filter-chips {
+      justify-content: center;
+    }
+  }
+
+  .beneficiaries-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+// Snackbar Styles
+::ng-deep {
+  .success-snackbar {
+    background: #10b981 !important;
+    color: white !important;
+  }
+
+  .error-snackbar {
+    background: #ef4444 !important;
+    color: white !important;
+  }
+}

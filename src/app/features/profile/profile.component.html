@@ -1,0 +1,317 @@
+<div class="profile-container">
+  <div class="profile-wrapper">
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>My Profile</h1>
+        <p>Manage your account information</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <mat-card *ngIf="loading" class="loading-card">
+      <mat-card-content>
+        <div class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Loading profile...</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Profile Content -->
+    <div *ngIf="!loading && profile" class="profile-content">
+      
+      <!-- Profile Summary Card -->
+      <mat-card class="profile-summary-card">
+        <mat-card-content>
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="profile-info">
+              <h2>{{ profile.fullName }}</h2>
+              <p class="customer-id">Customer ID: {{ profile.customerId }}</p>
+              <div class="status-badges">
+                <mat-chip [class]="getKycStatusClass()">
+                  <mat-icon>verified_user</mat-icon>
+                  KYC: {{ profile.kycStatus }}
+                </mat-chip>
+                <mat-chip [class]="getAccountStatusClass()">
+                  <mat-icon>check_circle</mat-icon>
+                  {{ profile.accountStatus }}
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Tabs -->
+      <mat-card class="tabs-card">
+        <mat-tab-group animationDuration="300ms">
+          
+          <!-- Profile Details Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">person</mat-icon>
+              Profile Details
+            </ng-template>
+            
+            <div class="tab-content">
+              <div class="details-grid">
+                <div class="detail-item">
+                  <mat-icon>phone</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Mobile Number</span>
+                    <span class="detail-value">{{ profile.mobileNumber }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>email</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ profile.email || 'Not provided' }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>cake</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Date of Birth</span>
+                    <span class="detail-value">{{ formatDate(profile.dateOfBirth) }}</span>
+                  </div>
+                </div>
+
+                <div class="detail-item">
+                  <mat-icon>wc</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Gender</span>
+                    <span class="detail-value">{{ profile.gender || 'Not provided' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <div class="address-section">
+                <h3>
+                  <mat-icon>location_on</mat-icon>
+                  Address Details
+                </h3>
+                <div class="address-content">
+                  <p *ngIf="profile.address">{{ profile.address }}</p>
+                  <p *ngIf="profile.city || profile.state">
+                    {{ profile.city }}{{ profile.city && profile.state ? ', ' : '' }}{{ profile.state }}
+                  </p>
+                  <p *ngIf="profile.pincode">PIN: {{ profile.pincode }}</p>
+                  <p *ngIf="!profile.address && !profile.city && !profile.state && !profile.pincode" class="no-data">
+                    No address information available
+                  </p>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Edit Profile Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">edit</mat-icon>
+              Edit Profile
+            </ng-template>
+
+            <div class="tab-content">
+              <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+                
+                <!-- Full Name -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Full Name</mat-label>
+                  <input matInput formControlName="fullName" placeholder="Enter your full name">
+                  <mat-icon matPrefix>person</mat-icon>
+                  <mat-error *ngIf="profileForm.get('fullName')?.hasError('required')">
+                    Name is required
+                  </mat-error>
+                  <mat-error *ngIf="profileForm.get('fullName')?.hasError('minlength')">
+                    Name must be at least 3 characters
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Email -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Email</mat-label>
+                  <input matInput formControlName="email" type="email" placeholder="Enter your email">
+                  <mat-icon matPrefix>email</mat-icon>
+                  <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                    Invalid email format
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Address -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Address</mat-label>
+                  <textarea 
+                    matInput 
+                    formControlName="address" 
+                    placeholder="Enter your address"
+                    rows="3"
+                  ></textarea>
+                  <mat-icon matPrefix>home</mat-icon>
+                </mat-form-field>
+
+                <!-- City and State -->
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>City</mat-label>
+                    <input matInput formControlName="city" placeholder="Enter city">
+                    <mat-icon matPrefix>location_city</mat-icon>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>State</mat-label>
+                    <input matInput formControlName="state" placeholder="Enter state">
+                    <mat-icon matPrefix>map</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <!-- Pincode -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Pincode</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="pincode" 
+                    placeholder="Enter 6-digit pincode"
+                    maxlength="6"
+                  >
+                  <mat-icon matPrefix>pin_drop</mat-icon>
+                  <mat-error *ngIf="profileForm.get('pincode')?.hasError('pattern')">
+                    Pincode must be 6 digits
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Update Button -->
+                <div class="form-actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary"
+                    type="submit"
+                    [disabled]="savingProfile || profileForm.invalid"
+                    class="update-button"
+                  >
+                    <mat-spinner 
+                      diameter="20" 
+                      *ngIf="savingProfile"
+                      class="button-spinner"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!savingProfile">save</mat-icon>
+                    <span *ngIf="!savingProfile">Update Profile</span>
+                    <span *ngIf="savingProfile">Updating...</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-tab>
+
+          <!-- Change MPIN Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">lock</mat-icon>
+              Change MPIN
+            </ng-template>
+
+            <div class="tab-content">
+              <div class="security-notice">
+                <mat-icon>security</mat-icon>
+                <div class="notice-text">
+                  <strong>Security Notice</strong>
+                  <p>Your MPIN is required for all transactions. Keep it secure and don't share it with anyone.</p>
+                </div>
+              </div>
+
+              <form [formGroup]="mpinForm" (ngSubmit)="changeMpin()" class="mpin-form">
+                
+                <!-- Current MPIN -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Current MPIN</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="currentMpin"
+                    [type]="hideCurrentMpin ? 'password' : 'text'"
+                    placeholder="Enter current 6-digit MPIN"
+                    maxlength="6"
+                  >
+                  <mat-icon matPrefix>lock</mat-icon>
+                  <button 
+                    mat-icon-button 
+                    matSuffix 
+                    type="button"
+                    (click)="hideCurrentMpin = !hideCurrentMpin"
+                  >
+                    <mat-icon>{{ hideCurrentMpin ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="mpinForm.get('currentMpin')?.hasError('required')">
+                    Current MPIN is required
+                  </mat-error>
+                  <mat-error *ngIf="mpinForm.get('currentMpin')?.hasError('pattern')">
+                    MPIN must be 6 digits
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- New MPIN -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>New MPIN</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="newMpin"
+                    [type]="hideNewMpin ? 'password' : 'text'"
+                    placeholder="Enter new 6-digit MPIN"
+                    maxlength="6"
+                  >
+                  <mat-icon matPrefix>lock_reset</mat-icon>
+                  <button 
+                    mat-icon-button 
+                    matSuffix 
+                    type="button"
+                    (click)="hideNewMpin = !hideNewMpin"
+                  >
+                    <mat-icon>{{ hideNewMpin ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                  <mat-hint>Choose a strong 6-digit MPIN</mat-hint>
+                  <mat-error *ngIf="mpinForm.get('newMpin')?.hasError('required')">
+                    New MPIN is required
+                  </mat-error>
+                  <mat-error *ngIf="mpinForm.get('newMpin')?.hasError('pattern')">
+                    MPIN must be 6 digits
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Change MPIN Button -->
+                <div class="form-actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary"
+                    type="submit"
+                    [disabled]="changingMpin || mpinForm.invalid"
+                    class="change-mpin-button"
+                  >
+                    <mat-spinner 
+                      diameter="20" 
+                      *ngIf="changingMpin"
+                      class="button-spinner"
+                    ></mat-spinner>
+                    <mat-icon *ngIf="!changingMpin">vpn_key</mat-icon>
+                    <span *ngIf="!changingMpin">Change MPIN</span>
+                    <span *ngIf="changingMpin">Changing...</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-tab>
+
+        </mat-tab-group>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,262 @@
+<div class="request-money-container">
+  <div class="request-money-wrapper">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>Request Money</h1>
+        <p>Request money from others or manage your requests</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-card class="tabs-card">
+      <mat-tab-group animationDuration="300ms">
+        
+        <!-- Create Request Tab -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">add_circle</mat-icon>
+            Create Request
+          </ng-template>
+
+          <div class="tab-content">
+            <div class="info-banner">
+              <mat-icon>info</mat-icon>
+              <div class="info-text">
+                <strong>Request Money</strong>
+                <p>Enter the mobile number of the person you want to request money from.</p>
+              </div>
+            </div>
+
+            <form [formGroup]="requestForm" (ngSubmit)="createRequest()" class="request-form">
+              
+              <!-- Mobile Number -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Mobile Number</mat-label>
+                <mat-icon matPrefix>phone</mat-icon>
+                <input 
+                  matInput 
+                  formControlName="requesteeMobile" 
+                  placeholder="Enter 10-digit mobile number"
+                  maxlength="10"
+                >
+                <mat-hint>Person you're requesting money from</mat-hint>
+                <mat-error *ngIf="requestForm.get('requesteeMobile')?.hasError('required')">
+                  Mobile number is required
+                </mat-error>
+                <mat-error *ngIf="requestForm.get('requesteeMobile')?.hasError('pattern')">
+                  Mobile number must be 10 digits
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Amount -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Amount</mat-label>
+                <span matPrefix style="margin-right: 5px; margin-left: 15px;">₹&nbsp;</span>
+                <input 
+                  matInput 
+                  formControlName="amount" 
+                  type="number"
+                  placeholder="Enter amount"
+                >
+                <mat-hint>Min: ₹1, Max: ₹1,00,000</mat-hint>
+                <mat-error *ngIf="requestForm.get('amount')?.hasError('required')">
+                  Amount is required
+                </mat-error>
+                <mat-error *ngIf="requestForm.get('amount')?.hasError('min')">
+                  Amount must be at least ₹1
+                </mat-error>
+                <mat-error *ngIf="requestForm.get('amount')?.hasError('max')">
+                  Maximum amount is ₹1,00,000
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Description -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description/Reason</mat-label>
+                <mat-icon matPrefix style="margin-top: 5px;">description</mat-icon>
+                <textarea 
+                  matInput 
+                  formControlName="description" 
+                  placeholder="Enter reason for request"
+                  rows="3"
+                  maxlength="500"
+                ></textarea>
+                <mat-hint align="end">{{ requestForm.get('description')?.value?.length || 0 }}/500</mat-hint>
+                <mat-error *ngIf="requestForm.get('description')?.hasError('required')">
+                  Description is required
+                </mat-error>
+                <mat-error *ngIf="requestForm.get('description')?.hasError('minlength')">
+                  Description must be at least 3 characters
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Submit Button -->
+              <div class="form-actions">
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  type="submit"
+                  [disabled]="submitting || requestForm.invalid"
+                  class="submit-button"
+                >
+                  <mat-spinner 
+                    diameter="20" 
+                    *ngIf="submitting"
+                    class="button-spinner"
+                  ></mat-spinner>
+                  <mat-icon *ngIf="!submitting">send</mat-icon>
+                  <span *ngIf="!submitting">Send Request</span>
+                  <span *ngIf="submitting">Sending...</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Received Requests Tab -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">inbox</mat-icon>
+            Received ({{ receivedRequests.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            <div *ngIf="loading" class="loading-container">
+              <mat-spinner diameter="50"></mat-spinner>
+              <p>Loading requests...</p>
+            </div>
+
+            <div *ngIf="!loading && receivedRequests.length === 0" class="no-requests">
+              <mat-icon>inbox</mat-icon>
+              <h3>No received requests</h3>
+              <p>You haven't received any money requests yet</p>
+            </div>
+
+            <div *ngIf="!loading && receivedRequests.length > 0" class="requests-list">
+              <mat-card *ngFor="let request of receivedRequests" class="request-card received">
+                <mat-card-content>
+                  <div class="request-header">
+                    <div class="request-info">
+                      <div class="request-user">
+                        <mat-icon>person</mat-icon>
+                        <div>
+                          <strong>{{ request.requesterName }}</strong>
+                          <span class="mobile">{{ request.requesterMobile }}</span>
+                        </div>
+                      </div>
+                      <div class="request-amount">{{ formatCurrency(request.amount) }}</div>
+                    </div>
+                    <mat-chip [class]="getStatusClass(request.status)">
+                      {{ request.status }}
+                    </mat-chip>
+                  </div>
+
+                  <mat-divider></mat-divider>
+
+                  <div class="request-details">
+                    <div class="detail-row">
+                      <mat-icon>description</mat-icon>
+                      <span>{{ request.description }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ formatDate(request.createdAt) }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="request.status === 'PENDING'">
+                      <mat-icon>timer</mat-icon>
+                      <span>Expires: {{ formatDate(request.expiresAt) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="request-actions" *ngIf="request.status === 'PENDING'">
+                    <button mat-stroked-button color="warn" (click)="rejectRequest(request)">
+                      <mat-icon>close</mat-icon>
+                      Reject
+                    </button>
+                    <button mat-raised-button color="primary" (click)="acceptRequest(request)">
+                      <mat-icon>check</mat-icon>
+                      Accept & Pay
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Sent Requests Tab -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">send</mat-icon>
+            Sent ({{ sentRequests.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            <div *ngIf="loading" class="loading-container">
+              <mat-spinner diameter="50"></mat-spinner>
+              <p>Loading requests...</p>
+            </div>
+
+            <div *ngIf="!loading && sentRequests.length === 0" class="no-requests">
+              <mat-icon>send</mat-icon>
+              <h3>No sent requests</h3>
+              <p>You haven't sent any money requests yet</p>
+            </div>
+
+            <div *ngIf="!loading && sentRequests.length > 0" class="requests-list">
+              <mat-card *ngFor="let request of sentRequests" class="request-card sent">
+                <mat-card-content>
+                  <div class="request-header">
+                    <div class="request-info">
+                      <div class="request-user">
+                        <mat-icon>person</mat-icon>
+                        <div>
+                          <strong>{{ request.requesteeName }}</strong>
+                          <span class="mobile">{{ request.requesteeMobile }}</span>
+                        </div>
+                      </div>
+                      <div class="request-amount">{{ formatCurrency(request.amount) }}</div>
+                    </div>
+                    <mat-chip [class]="getStatusClass(request.status)">
+                      {{ request.status }}
+                    </mat-chip>
+                  </div>
+
+                  <mat-divider></mat-divider>
+
+                  <div class="request-details">
+                    <div class="detail-row">
+                      <mat-icon>description</mat-icon>
+                      <span>{{ request.description }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ formatDate(request.createdAt) }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="request.status === 'PENDING'">
+                      <mat-icon>timer</mat-icon>
+                      <span>Expires: {{ formatDate(request.expiresAt) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="request-actions" *ngIf="request.status === 'PENDING'">
+                    <button mat-stroked-button color="warn" (click)="cancelRequest(request)">
+                      <mat-icon>cancel</mat-icon>
+                      Cancel Request
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </mat-card>
+  </div>
+</div>

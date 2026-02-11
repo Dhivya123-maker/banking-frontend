@@ -1,0 +1,341 @@
+<div class="qr-payments-container">
+  <div class="qr-payments-wrapper">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>QR Payments</h1>
+        <p>Generate, scan & pay with QR codes</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="qr-tabs">
+      
+      <!-- Tab 1: Generate QR -->
+      <mat-tab label="Generate QR">
+        <div class="tab-content">
+          
+          <!-- Generate Form -->
+          <mat-card class="generate-card" *ngIf="!generatedQR">
+            <mat-card-header>
+              <mat-card-title>Generate QR Code</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="generateQRForm" (ngSubmit)="generateQR()">
+                
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>QR Type</mat-label>
+                  <mat-select formControlName="qrType">
+                    <mat-option *ngFor="let type of qrTypes" [value]="type.value">
+                      <mat-icon>{{ type.icon }}</mat-icon>
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-icon matPrefix>qr_code_2</mat-icon>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Amount (Optional)</mat-label>
+                  <span matPrefix>₹&nbsp;</span>
+                  <input matInput formControlName="amount" type="number" placeholder="Leave empty for dynamic amount">
+                  <mat-icon matPrefix>payments</mat-icon>
+                  <mat-hint>Leave empty to allow payer to enter amount</mat-hint>
+                  <mat-error *ngIf="generateQRForm.get('amount')?.hasError('min')">
+                    Amount must be greater than 0
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Expiry Time (minutes)</mat-label>
+                  <input matInput formControlName="expiryMinutes" type="number">
+                  <mat-icon matPrefix>schedule</mat-icon>
+                  <mat-hint>QR code will expire after this time (5-1440 minutes)</mat-hint>
+                  <mat-error *ngIf="generateQRForm.get('expiryMinutes')?.hasError('required')">
+                    Expiry time is required
+                  </mat-error>
+                  <mat-error *ngIf="generateQRForm.get('expiryMinutes')?.hasError('min')">
+                    Minimum 5 minutes
+                  </mat-error>
+                  <mat-error *ngIf="generateQRForm.get('expiryMinutes')?.hasError('max')">
+                    Maximum 1440 minutes (24 hours)
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="loading || generateQRForm.invalid">
+                    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                    <mat-icon *ngIf="!loading">qr_code_2</mat-icon>
+                    <span *ngIf="!loading">Generate QR Code</span>
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Generated QR Display -->
+          <mat-card class="generated-qr-card" *ngIf="generatedQR">
+            <mat-card-header>
+              <mat-card-title>Your QR Code</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="qr-display">
+                <div class="qr-code-wrapper">
+                                <qrcode 
+                [qrdata]="generatedQR.qrCode" 
+                [width]="256" 
+                [errorCorrectionLevel]="'M'"
+                [colorDark]="'#667eea'"
+                [colorLight]="'#ffffff'"
+                ></qrcode>
+                </div>
+
+                <div class="qr-details">
+                  <div class="detail-row">
+                    <mat-icon>qr_code</mat-icon>
+                    <div>
+                      <small>QR Code</small>
+                      <strong>{{ generatedQR.qrCode }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="detail-row" *ngIf="generatedQR.amount">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <small>Amount</small>
+                      <strong>{{ formatCurrency(generatedQR.amount) }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="detail-row" *ngIf="!generatedQR.amount">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <small>Amount</small>
+                      <strong class="dynamic-amount">Dynamic (Payer decides)</strong>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <mat-icon>schedule</mat-icon>
+                    <div>
+                      <small>Expires</small>
+                      <strong>{{ getTimeRemaining(generatedQR.expiresAt) }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <mat-icon>person</mat-icon>
+                    <div>
+                      <small>Merchant Name</small>
+                      <strong>{{ generatedQR.merchantName }}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="qr-actions">
+                  <button mat-raised-button (click)="downloadQR()">
+                    <mat-icon>download</mat-icon>
+                    Download
+                  </button>
+                  <button mat-raised-button (click)="shareQR()">
+                    <mat-icon>share</mat-icon>
+                    Share
+                  </button>
+                  <button mat-raised-button (click)="copyQRCode()">
+                    <mat-icon>content_copy</mat-icon>
+                    Copy Code
+                  </button>
+                  <button mat-raised-button color="warn" (click)="resetGenerateForm()">
+                    <mat-icon>close</mat-icon>
+                    Clear
+                  </button>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Active QR Codes -->
+          <div class="active-qrs-section" *ngIf="activeQRCodes.length > 0 && !generatedQR">
+            <h3>Active QR Codes</h3>
+            <div class="active-qrs-grid">
+              <mat-card *ngFor="let qr of activeQRCodes" class="active-qr-card">
+                <mat-card-content>
+                  <div class="mini-qr">
+                    <qrcode 
+                      [qrdata]="qr.qrCode" 
+                      [width]="100" 
+                      [errorCorrectionLevel]="'M'"
+                    ></qrcode>
+                  </div>
+                  <div class="qr-info">
+                    <strong *ngIf="qr.amount">{{ formatCurrency(qr.amount) }}</strong>
+                    <strong *ngIf="!qr.amount" class="dynamic">Dynamic Amount</strong>
+                    <small>{{ getTimeRemaining(qr.expiresAt) }}</small>
+                    <mat-chip class="status-chip">{{ qr.paymentStatus }}</mat-chip>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Scan & Pay -->
+      <mat-tab label="Scan & Pay">
+        <div class="tab-content">
+          
+          <!-- Scan Form -->
+          <mat-card class="scan-card" *ngIf="!scannedQR">
+            <mat-card-header>
+              <mat-card-title>Scan QR Code</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="scanQRForm" (ngSubmit)="scanQR()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Enter QR Code</mat-label>
+                  <input matInput formControlName="qrCode" placeholder="Paste QR code here">
+                  <mat-icon matPrefix>qr_code_scanner</mat-icon>
+                  <mat-error *ngIf="scanQRForm.get('qrCode')?.hasError('required')">
+                    QR code is required
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="loading || scanQRForm.invalid">
+                    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                    <mat-icon *ngIf="!loading">qr_code_scanner</mat-icon>
+                    <span *ngIf="!loading">Scan QR Code</span>
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Payment Form -->
+          <mat-card class="payment-card" *ngIf="scannedQR">
+            <mat-card-header>
+              <mat-card-title>Payment Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="merchant-info">
+                <div class="merchant-icon">
+                  <mat-icon>store</mat-icon>
+                </div>
+                <div>
+                  <h3>{{ scannedQR.merchantName }}</h3>
+                  <p>{{ scannedQR.accountNumber }}</p>
+                </div>
+              </div>
+
+              <mat-divider></mat-divider>
+
+              <form [formGroup]="payQRForm" (ngSubmit)="payQR()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Amount</mat-label>
+                  <span matPrefix>₹&nbsp;</span>
+                  <input 
+                    matInput 
+                    formControlName="amount" 
+                    type="number"
+                    [readonly]="scannedQR.amount !== null && scannedQR.amount > 0"
+                  >
+                  <mat-icon matPrefix>payments</mat-icon>
+                  <mat-error *ngIf="payQRForm.get('amount')?.hasError('required')">
+                    Amount is required
+                  </mat-error>
+                  <mat-error *ngIf="payQRForm.get('amount')?.hasError('min')">
+                    Amount must be greater than 0
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>MPIN</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="mpin" 
+                    type="password"
+                    maxlength="6"
+                    placeholder="Enter 6-digit MPIN"
+                  >
+                  <mat-icon matPrefix>lock</mat-icon>
+                  <mat-error *ngIf="payQRForm.get('mpin')?.hasError('required')">
+                    MPIN is required
+                  </mat-error>
+                  <mat-error *ngIf="payQRForm.get('mpin')?.hasError('pattern')">
+                    MPIN must be 6 digits
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="form-actions">
+                  <button mat-button type="button" (click)="resetScanForm()">Cancel</button>
+                  <button mat-raised-button color="primary" type="submit" [disabled]="submitting || payQRForm.invalid">
+                    <mat-spinner diameter="20" *ngIf="submitting"></mat-spinner>
+                    <span *ngIf="!submitting">Pay {{ formatCurrency(payQRForm.get('amount')?.value || 0) }}</span>
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 3: History -->
+      <mat-tab label="History">
+        <div class="tab-content">
+          
+          <!-- No History -->
+          <div *ngIf="qrHistory.length === 0" class="no-history">
+            <mat-icon>history</mat-icon>
+            <h3>No QR Payment History</h3>
+            <p>Your QR payment transactions will appear here</p>
+          </div>
+
+          <!-- History List -->
+          <div class="history-list" *ngIf="qrHistory.length > 0">
+            <mat-card *ngFor="let payment of qrHistory" class="history-card">
+              <mat-card-content>
+                <div class="history-header">
+                  <div class="history-icon" [class]="payment.qrType.toLowerCase()">
+                    <mat-icon>{{ payment.qrType === 'RECEIVE' ? 'call_received' : 'send' }}</mat-icon>
+                  </div>
+                  <div class="history-info">
+                    <h4>{{ payment.merchantName }}</h4>
+                    <small>{{ payment.qrCode }}</small>
+                  </div>
+                  <mat-chip [class]="getStatusClass(payment.paymentStatus)">
+                    {{ payment.paymentStatus }}
+                  </mat-chip>
+                </div>
+
+                <div class="history-details">
+                  <div class="detail-row">
+                    <span class="label">Amount:</span>
+                    <strong class="amount" *ngIf="payment.amount">{{ formatCurrency(payment.amount) }}</strong>
+                    <strong class="amount dynamic" *ngIf="!payment.amount">Dynamic</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Type:</span>
+                    <span>{{ payment.qrType }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Created:</span>
+                    <span>{{ formatDate(payment.createdAt) }}</span>
+                  </div>
+                  <div class="detail-row" *ngIf="payment.completedAt">
+                    <span class="label">Completed:</span>
+                    <span>{{ formatDate(payment.completedAt) }}</span>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

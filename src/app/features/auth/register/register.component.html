@@ -1,0 +1,201 @@
+<div class="register-container">
+  <div class="register-card-wrapper">
+    <mat-card class="register-card">
+      <mat-card-header>
+        <div class="logo-container">
+          <mat-icon class="logo-icon">account_balance</mat-icon>
+        </div>
+        <mat-card-title>Create Account</mat-card-title>
+        <mat-card-subtitle>Join us for secure banking</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-stepper #stepper linear>
+          <!-- Step 1: Personal Information -->
+          <mat-step [stepControl]="personalInfoForm">
+            <form [formGroup]="personalInfoForm">
+              <ng-template matStepLabel>Personal Info</ng-template>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Full Name</mat-label>
+                <input matInput formControlName="fullName" placeholder="Enter your full name">
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-error *ngIf="personalInfoForm.get('fullName')?.hasError('required')">
+                  Full name is required
+                </mat-error>
+                <mat-error *ngIf="personalInfoForm.get('fullName')?.hasError('minlength')">
+                  Name must be at least 3 characters
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Date of Birth</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dateOfBirth" [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="personalInfoForm.get('dateOfBirth')?.hasError('required')">
+                  Date of birth is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+  <mat-label>Gender</mat-label>
+  <mat-select formControlName="gender">
+    <mat-option value="M">Male</mat-option>           <!-- Changed from MALE to M -->
+    <mat-option value="F">Female</mat-option>         <!-- Changed from FEMALE to F -->
+    <mat-option value="O">Other</mat-option>          <!-- Changed from OTHER to O -->
+  </mat-select>
+  <mat-icon matPrefix>wc</mat-icon>
+  <mat-error *ngIf="personalInfoForm.get('gender')?.hasError('required')">
+    Gender is required
+  </mat-error>
+</mat-form-field>
+
+              <div class="button-row">
+                <button mat-raised-button color="primary" matStepperNext>Next</button>
+              </div>
+            </form>
+          </mat-step>
+
+          <!-- Step 2: Contact Information -->
+          <mat-step [stepControl]="contactForm">
+            <form [formGroup]="contactForm">
+              <ng-template matStepLabel>Contact Info</ng-template>
+              
+              <mat-form-field appearance="outline" class="full-width">
+  <mat-label>Mobile Number</mat-label>
+  <input matInput formControlName="mobileNumber" maxlength="10" type="tel">
+  <mat-icon matPrefix>phone</mat-icon>
+  <mat-error *ngIf="contactForm.get('mobileNumber')?.hasError('required')">
+    Mobile number is required
+  </mat-error>
+  <mat-error *ngIf="contactForm.get('mobileNumber')?.hasError('pattern')">
+    Mobile must start with 6, 7, 8, or 9 and be 10 digits
+  </mat-error>
+  <mat-hint>Enter Indian mobile number (e.g., 9876543210)</mat-hint>
+</mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email">
+                <mat-icon matPrefix>email</mat-icon>
+                <mat-error *ngIf="contactForm.get('email')?.hasError('required')">
+                  Email is required
+                </mat-error>
+                <mat-error *ngIf="contactForm.get('email')?.hasError('email')">
+                  Enter valid email address
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Address</mat-label>
+                <textarea matInput formControlName="address" rows="2"></textarea>
+                <mat-icon matPrefix>home</mat-icon>
+                <mat-error *ngIf="contactForm.get('address')?.hasError('required')">
+                  Address is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>City</mat-label>
+                <input matInput formControlName="city">
+                <mat-error *ngIf="contactForm.get('city')?.hasError('required')">
+                  City is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>State</mat-label>
+                <mat-select formControlName="state">
+                  <mat-option *ngFor="let state of states" [value]="state">
+                    {{ state }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="contactForm.get('state')?.hasError('required')">
+                  State is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Pincode</mat-label>
+                <input matInput formControlName="pincode" maxlength="6" type="tel">
+                <mat-error *ngIf="contactForm.get('pincode')?.hasError('required')">
+                  Pincode is required
+                </mat-error>
+                <mat-error *ngIf="contactForm.get('pincode')?.hasError('pattern')">
+                  Enter valid 6-digit pincode
+                </mat-error>
+              </mat-form-field>
+
+              <div class="button-row">
+                <button mat-button matStepperPrevious>Back</button>
+                <button mat-raised-button color="primary" matStepperNext>Next</button>
+              </div>
+            </form>
+          </mat-step>
+
+          <!-- Step 3: Set MPIN -->
+          <mat-step [stepControl]="mpinForm">
+            <form [formGroup]="mpinForm" (ngSubmit)="onSubmit()">
+              <ng-template matStepLabel>Set MPIN</ng-template>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>MPIN</mat-label>
+                <input matInput formControlName="mpin" 
+                       [type]="hidePassword ? 'password' : 'text'" 
+                       maxlength="6">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix type="button"
+                        (click)="togglePasswordVisibility('mpin')">
+                  <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+                <mat-hint>Enter 6-digit numeric MPIN</mat-hint>
+                <mat-error *ngIf="mpinForm.get('mpin')?.hasError('required')">
+                  MPIN is required
+                </mat-error>
+                <mat-error *ngIf="mpinForm.get('mpin')?.hasError('pattern')">
+                  MPIN must be 6 digits
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Confirm MPIN</mat-label>
+                <input matInput formControlName="confirmMpin" 
+                       [type]="hideConfirmPassword ? 'password' : 'text'" 
+                       maxlength="6">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix type="button"
+                        (click)="togglePasswordVisibility('confirmMpin')">
+                  <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </button>
+                <mat-error *ngIf="mpinForm.get('confirmMpin')?.hasError('required')">
+                  Please confirm your MPIN
+                </mat-error>
+                <mat-error *ngIf="mpinForm.hasError('mpinMismatch')">
+                  MPINs do not match
+                </mat-error>
+              </mat-form-field>
+
+              <div *ngIf="errorMessage" class="error-message">
+                <mat-icon>error</mat-icon>
+                <span>{{ errorMessage }}</span>
+              </div>
+
+              <div class="button-row">
+                <button mat-button matStepperPrevious type="button">Back</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+                  <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+                  <span *ngIf="!loading">Register</span>
+                </button>
+              </div>
+            </form>
+          </mat-step>
+        </mat-stepper>
+
+        <div class="login-link">
+          <p>Already have an account? <a routerLink="/auth/login">Login here</a></p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

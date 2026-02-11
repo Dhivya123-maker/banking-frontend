@@ -1,0 +1,183 @@
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.register-card-wrapper {
+  width: 100%;
+  max-width: 600px;
+}
+
+.register-card {
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+
+  mat-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+
+    .logo-container {
+      margin-bottom: 15px;
+
+      .logo-icon {
+        font-size: 60px;
+        width: 60px;
+        height: 60px;
+        color: #667eea;
+      }
+    }
+
+    mat-card-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    mat-card-subtitle {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+  }
+
+  mat-card-content {
+    padding-top: 20px;
+
+    .full-width {
+      width: 100%;
+      margin-bottom: 16px;
+      margin-top: 5px;
+    }
+
+    mat-form-field {
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background-color: #f8f9fa;
+      }
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+
+      button {
+        min-width: 100px;
+      }
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+
+      p {
+        font-size: 14px;
+        color: #666;
+
+        a {
+          color: #667eea;
+          text-decoration: none;
+          font-weight: 600;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Stepper customization
+::ng-deep {
+  .mat-stepper-horizontal {
+    background: transparent;
+  }
+
+  .mat-step-header {
+    pointer-events: none !important;
+    
+    .mat-step-icon {
+      background-color: #667eea;
+    }
+
+    .mat-step-icon-selected {
+      background-color: #764ba2;
+    }
+  }
+
+  .mat-step-label {
+    font-weight: 500;
+  }
+
+  .mat-step-label-selected {
+    color: #667eea !important;
+    font-weight: 600;
+  }
+}
+
+// Spinner in button
+.button-spinner {
+  ::ng-deep circle {
+    stroke: white;
+  }
+}
+
+// Responsive Design
+@media (max-width: 600px) {
+  .register-container {
+    padding: 10px;
+  }
+
+  .register-card {
+    padding: 15px;
+
+    mat-card-header {
+      .logo-icon {
+        font-size: 50px !important;
+        width: 50px !important;
+        height: 50px !important;
+      }
+
+      mat-card-title {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 10px;
+
+    button {
+      width: 100%;
+    }
+  }
+}

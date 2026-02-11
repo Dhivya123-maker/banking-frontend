@@ -1,0 +1,311 @@
+<div class="cards-container">
+  <div class="cards-wrapper">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>My Cards</h1>
+        <p>Manage your debit and credit cards</p>
+      </div>
+      <button mat-raised-button color="primary" (click)="toggleAddCardForm()" class="add-card-button">
+        <mat-icon>add</mat-icon>
+        Add Card
+      </button>
+    </div>
+
+    <!-- Add Card Form -->
+    <mat-card class="add-card-form" *ngIf="showAddCardForm">
+      <mat-card-header>
+        <mat-card-title>Add New Card</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="addCardForm" (ngSubmit)="addCard()">
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Card Number</mat-label>
+              <input 
+                matInput 
+                formControlName="cardNumber" 
+                placeholder="Enter 16-digit card number"
+                maxlength="16"
+              >
+              <mat-icon matPrefix>credit_card</mat-icon>
+              <mat-error *ngIf="addCardForm.get('cardNumber')?.hasError('required')">
+                Card number is required
+              </mat-error>
+              <mat-error *ngIf="addCardForm.get('cardNumber')?.hasError('pattern')">
+                Card number must be 16 digits
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Card Type</mat-label>
+              <mat-select formControlName="cardType">
+                <mat-option *ngFor="let type of cardTypes" [value]="type">
+                  {{ type }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Cardholder Name</mat-label>
+              <input 
+                matInput 
+                formControlName="cardHolderName" 
+                placeholder="Name on card"
+              >
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="addCardForm.get('cardHolderName')?.hasError('required')">
+                Name is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="third-width">
+              <mat-label>Expiry Month</mat-label>
+              <mat-select formControlName="expiryMonth">
+                <mat-option *ngFor="let month of months" [value]="month">
+                  {{ month }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="third-width">
+              <mat-label>Expiry Year</mat-label>
+              <mat-select formControlName="expiryYear">
+                <mat-option *ngFor="let year of years" [value]="year">
+                  {{ year }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="third-width">
+              <mat-label>CVV</mat-label>
+              <input 
+                matInput 
+                formControlName="cvv" 
+                placeholder="123"
+                maxlength="3"
+                type="password"
+              >
+              <mat-icon matPrefix>lock</mat-icon>
+              <mat-error *ngIf="addCardForm.get('cvv')?.hasError('required')">
+                CVV is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Daily Limit</mat-label>
+              <span matPrefix>₹&nbsp;</span>
+              <input 
+                matInput 
+                formControlName="dailyLimit" 
+                type="number"
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Monthly Limit</mat-label>
+              <span matPrefix>₹&nbsp;</span>
+              <input 
+                matInput 
+                formControlName="monthlyLimit" 
+                type="number"
+              >
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="toggleAddCardForm()">
+              Cancel
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              [disabled]="submitting || addCardForm.invalid"
+            >
+              <mat-spinner diameter="20" *ngIf="submitting"></mat-spinner>
+              <span *ngIf="!submitting">Add Card</span>
+              <span *ngIf="submitting">Adding...</span>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading cards...</p>
+    </div>
+
+    <!-- No Cards -->
+    <div *ngIf="!loading && cards.length === 0" class="no-cards">
+      <mat-icon>credit_card_off</mat-icon>
+      <h3>No Cards Found</h3>
+      <p>Add your first card to get started</p>
+      <button mat-raised-button color="primary" (click)="toggleAddCardForm()">
+        <mat-icon>add</mat-icon>
+        Add Card
+      </button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div *ngIf="!loading && cards.length > 0" class="cards-grid">
+      <mat-card *ngFor="let card of cards" class="card-item" [class.primary]="card.isPrimary">
+        
+        <!-- Card Visual -->
+        <div class="card-visual" [class]="card.cardType.toLowerCase()">
+          <div class="card-header">
+            <div class="card-brand">
+              <mat-icon>{{ getCardBrandIcon(card.cardBrand) }}</mat-icon>
+              <span>{{ card.cardBrand }}</span>
+            </div>
+            <mat-chip [class]="getCardStatusClass(card.cardStatus)">
+              {{ card.cardStatus }}
+            </mat-chip>
+          </div>
+
+          <div class="card-number">{{ card.cardNumber }}</div>
+
+          <div class="card-footer" style="margin-bottom: 30px;">
+            <div class="card-holder">
+              <small>CARDHOLDER</small>
+              <strong>{{ card.cardHolderName }}</strong>
+            </div>
+            <div class="card-expiry">
+              <small>EXPIRES</small>
+              <strong>{{ card.expiryDate }}</strong>
+            </div>
+          </div>
+
+          <div class="card-type-badge">
+            <mat-icon>{{ getCardTypeIcon(card.cardType) }}</mat-icon>
+            {{ card.cardType }}
+          </div>
+
+          <mat-chip *ngIf="card.isPrimary" class="primary-badge">
+            <mat-icon>star</mat-icon>
+            PRIMARY
+          </mat-chip>
+        </div>
+
+        <!-- Card Details -->
+        <mat-card-content>
+          <div class="card-limits">
+            <div class="limit-item">
+              <mat-icon>today</mat-icon>
+              <div>
+                <small>Daily Limit</small>
+                <strong>{{ formatCurrency(card.dailyLimit) }}</strong>
+              </div>
+            </div>
+            <div class="limit-item">
+              <mat-icon>calendar_month</mat-icon>
+              <div>
+                <small>Monthly Limit</small>
+                <strong>{{ formatCurrency(card.monthlyLimit) }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="card-settings">
+            <div class="setting-item">
+              <div class="setting-label">
+                <mat-icon>local_atm</mat-icon>
+                <span>ATM Withdrawals</span>
+              </div>
+              <mat-slide-toggle 
+                [checked]="card.atmEnabled"
+                (change)="toggleCardSetting(card, 'atm')"
+                [disabled]="card.cardStatus !== 'ACTIVE'"
+              ></mat-slide-toggle>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-label">
+                <mat-icon>shopping_cart</mat-icon>
+                <span>Online Payments</span>
+              </div>
+              <mat-slide-toggle 
+                [checked]="card.onlineEnabled"
+                (change)="toggleCardSetting(card, 'online')"
+                [disabled]="card.cardStatus !== 'ACTIVE'"
+              ></mat-slide-toggle>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-label">
+                <mat-icon>contactless</mat-icon>
+                <span>Contactless</span>
+              </div>
+              <mat-slide-toggle 
+                [checked]="card.contactlessEnabled"
+                (change)="toggleCardSetting(card, 'contactless')"
+                [disabled]="card.cardStatus !== 'ACTIVE'"
+              ></mat-slide-toggle>
+            </div>
+
+            <div class="setting-item">
+              <div class="setting-label">
+                <mat-icon>public</mat-icon>
+                <span>International</span>
+              </div>
+              <mat-slide-toggle 
+                [checked]="card.internationalEnabled"
+                (change)="toggleCardSetting(card, 'international')"
+                [disabled]="card.cardStatus !== 'ACTIVE'"
+              ></mat-slide-toggle>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="card-actions">
+            <button 
+              mat-button 
+              *ngIf="!card.isPrimary && card.cardStatus === 'ACTIVE'"
+              (click)="setPrimaryCard(card)"
+            >
+              <mat-icon>star_outline</mat-icon>
+              Set as Primary
+            </button>
+
+            <button 
+              mat-button 
+              color="warn"
+              *ngIf="card.cardStatus === 'ACTIVE'"
+              (click)="blockCard(card)"
+            >
+              <mat-icon>block</mat-icon>
+              Block Card
+            </button>
+
+            <button 
+              mat-button 
+              color="primary"
+              *ngIf="card.cardStatus === 'BLOCKED'"
+              (click)="unblockCard(card)"
+            >
+              <mat-icon>check_circle</mat-icon>
+              Unblock Card
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

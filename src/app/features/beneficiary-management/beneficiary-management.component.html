@@ -1,0 +1,381 @@
+<div class="beneficiary-container">
+  <div class="beneficiary-wrapper">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>Beneficiaries</h1>
+        <p>Manage your saved beneficiaries</p>
+      </div>
+      <button mat-raised-button color="primary" (click)="toggleAddForm()" class="add-button">
+        <mat-icon>{{ showAddForm ? 'close' : 'add' }}</mat-icon>
+        {{ showAddForm ? 'Cancel' : 'Add Beneficiary' }}
+      </button>
+    </div>
+
+    <!-- Add Beneficiary Form -->
+    <mat-card class="add-form-card" *ngIf="showAddForm">
+      <mat-card-header>
+        <mat-card-title>Add New Beneficiary</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="addBeneficiaryForm" (ngSubmit)="addBeneficiary()">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Beneficiary Name</mat-label>
+              <input matInput formControlName="beneficiaryName" placeholder="Enter full name">
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="addBeneficiaryForm.get('beneficiaryName')?.hasError('required')">
+                Name is required
+              </mat-error>
+              <mat-error *ngIf="addBeneficiaryForm.get('beneficiaryName')?.hasError('minlength')">
+                Minimum 3 characters required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nickname (Optional)</mat-label>
+              <input matInput formControlName="nickname" placeholder="e.g., John">
+              <mat-icon matPrefix>label</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Account Number</mat-label>
+              <input matInput formControlName="accountNumber" placeholder="Enter account number">
+              <mat-icon matPrefix>account_balance</mat-icon>
+              <mat-error *ngIf="addBeneficiaryForm.get('accountNumber')?.hasError('required')">
+                Account number is required
+              </mat-error>
+              <mat-error *ngIf="addBeneficiaryForm.get('accountNumber')?.hasError('pattern')">
+                Invalid account number (9-18 digits)
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>IFSC Code</mat-label>
+              <input matInput formControlName="ifscCode" placeholder="e.g., SBIN0001234" style="text-transform: uppercase">
+              <mat-icon matPrefix>code</mat-icon>
+              <mat-error *ngIf="addBeneficiaryForm.get('ifscCode')?.hasError('required')">
+                IFSC code is required
+              </mat-error>
+              <mat-error *ngIf="addBeneficiaryForm.get('ifscCode')?.hasError('pattern')">
+                Invalid IFSC code format
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Bank Name</mat-label>
+              <mat-select formControlName="bankName">
+                <mat-option value="">Select Bank</mat-option>
+                <mat-option *ngFor="let bank of banks" [value]="bank">
+                  {{ bank }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>account_balance</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Branch Name (Optional)</mat-label>
+              <input matInput formControlName="branchName" placeholder="Enter branch name">
+              <mat-icon matPrefix>location_on</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Mobile Number (Optional)</mat-label>
+              <input matInput formControlName="mobileNumber" placeholder="10-digit mobile number">
+              <mat-icon matPrefix>phone</mat-icon>
+              <mat-error *ngIf="addBeneficiaryForm.get('mobileNumber')?.hasError('pattern')">
+                Invalid mobile number
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email (Optional)</mat-label>
+              <input matInput formControlName="email" placeholder="email@example.com">
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error *ngIf="addBeneficiaryForm.get('email')?.hasError('email')">
+                Invalid email format
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="toggleAddForm()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="loading || addBeneficiaryForm.invalid">
+              <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+              <span *ngIf="!loading">Add Beneficiary</span>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Search and Filters -->
+    <div class="search-filter-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search beneficiaries</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="searchTerm"
+          (keyup)="searchBeneficiaries()"
+          placeholder="Search by name..."
+        >
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <div class="filter-chips">
+        <mat-chip-option 
+          [selected]="selectedFilter === 'all'"
+          (click)="selectedFilter = 'all'; applyFilter()"
+        >
+          All
+        </mat-chip-option>
+        <mat-chip-option 
+          [selected]="selectedFilter === 'favorites'"
+          (click)="selectedFilter = 'favorites'; applyFilter()"
+        >
+          <mat-icon>star</mat-icon>
+          Favorites
+        </mat-chip-option>
+        <mat-chip-option 
+          [selected]="selectedFilter === 'frequent'"
+          (click)="selectedFilter = 'frequent'; applyFilter()"
+        >
+          <mat-icon>history</mat-icon>
+          Frequent
+        </mat-chip-option>
+      </div>
+    </div>
+
+    <!-- Quick Access - Favorites -->
+    <div class="favorites-section" *ngIf="favoriteBeneficiaries.length > 0 && selectedFilter === 'all'">
+      <h3>
+        <mat-icon>star</mat-icon>
+        Favorite Beneficiaries
+      </h3>
+      <div class="favorites-grid">
+        <mat-card *ngFor="let beneficiary of favoriteBeneficiaries" class="favorite-card">
+          <mat-card-content>
+            <div class="favorite-header">
+              <div class="avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="favorite-info">
+                <strong>{{ beneficiary.nickname || beneficiary.beneficiaryName }}</strong>
+                <small>{{ beneficiary.bankName }}</small>
+              </div>
+            </div>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="sendMoneyToBeneficiary(beneficiary)"
+              class="quick-send-button"
+            >
+              <mat-icon>send</mat-icon>
+              Send Money
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading && !showAddForm" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading beneficiaries...</p>
+    </div>
+
+    <!-- Beneficiaries List -->
+    <div class="beneficiaries-section" *ngIf="!loading">
+      <h3>All Beneficiaries ({{ filteredBeneficiaries.length }})</h3>
+
+      <!-- No Beneficiaries -->
+      <div *ngIf="filteredBeneficiaries.length === 0" class="no-beneficiaries">
+        <mat-icon>person_add</mat-icon>
+        <h3>No Beneficiaries Found</h3>
+        <p *ngIf="searchTerm">Try a different search term</p>
+        <p *ngIf="!searchTerm && selectedFilter === 'all'">Add your first beneficiary to get started</p>
+        <button mat-raised-button color="primary" (click)="toggleAddForm()" *ngIf="!searchTerm && selectedFilter === 'all'">
+          <mat-icon>add</mat-icon>
+          Add Beneficiary
+        </button>
+      </div>
+
+      <!-- Beneficiaries Grid -->
+      <div class="beneficiaries-grid" *ngIf="filteredBeneficiaries.length > 0">
+        <mat-card *ngFor="let beneficiary of filteredBeneficiaries" class="beneficiary-card">
+          
+          <!-- Edit Mode -->
+          <mat-card-content *ngIf="editingBeneficiary?.beneficiaryId === beneficiary.beneficiaryId">
+            <form [formGroup]="editBeneficiaryForm" (ngSubmit)="updateBeneficiary()">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Beneficiary Name</mat-label>
+                <input matInput formControlName="beneficiaryName">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nickname</mat-label>
+                <input matInput formControlName="nickname">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Mobile Number</mat-label>
+                <input matInput formControlName="mobileNumber">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email">
+              </mat-form-field>
+
+              <div class="edit-actions">
+                <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+                <button mat-raised-button color="primary" type="submit">Save</button>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <!-- View Mode -->
+          <mat-card-content *ngIf="editingBeneficiary?.beneficiaryId !== beneficiary.beneficiaryId">
+            <div class="beneficiary-header">
+              <div class="beneficiary-info">
+                <div class="avatar-large">
+                  <mat-icon>account_circle</mat-icon>
+                </div>
+                <div>
+                  <h4>{{ beneficiary.nickname || beneficiary.beneficiaryName }}</h4>
+                  <p *ngIf="beneficiary.nickname">{{ beneficiary.beneficiaryName }}</p>
+                  <mat-chip class="type-chip">{{ beneficiary.beneficiaryType }}</mat-chip>
+                </div>
+              </div>
+              <button 
+                mat-icon-button 
+                (click)="toggleFavorite(beneficiary, $event)"
+                [class.favorite-active]="beneficiary.isFavorite"
+                matTooltip="{{ beneficiary.isFavorite ? 'Remove from favorites' : 'Add to favorites' }}"
+              >
+                <mat-icon>{{ beneficiary.isFavorite ? 'star' : 'star_border' }}</mat-icon>
+              </button>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="beneficiary-details">
+              <div class="detail-row">
+                <mat-icon>account_balance</mat-icon>
+                <div>
+                  <small>Account Number</small>
+                  <strong>{{ beneficiary.accountNumber }}</strong>
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon>code</mat-icon>
+                <div>
+                  <small>IFSC Code</small>
+                  <strong>{{ beneficiary.ifscCode }}</strong>
+                </div>
+              </div>
+
+              <div class="detail-row" *ngIf="beneficiary.bankName">
+                <mat-icon>account_balance</mat-icon>
+                <div>
+                  <small>Bank</small>
+                  <strong>{{ beneficiary.bankName }}</strong>
+                </div>
+              </div>
+
+              <div class="detail-row" *ngIf="beneficiary.branchName">
+                <mat-icon>location_on</mat-icon>
+                <div>
+                  <small>Branch</small>
+                  <strong>{{ beneficiary.branchName }}</strong>
+                </div>
+              </div>
+
+              <div class="detail-row" *ngIf="beneficiary.mobileNumber">
+                <mat-icon>phone</mat-icon>
+                <div>
+                  <small>Mobile</small>
+                  <strong>{{ beneficiary.mobileNumber }}</strong>
+                </div>
+              </div>
+
+              <div class="detail-row" *ngIf="beneficiary.email">
+                <mat-icon>email</mat-icon>
+                <div>
+                  <small>Email</small>
+                  <strong>{{ beneficiary.email }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="transaction-stats" *ngIf="beneficiary.totalTransactions > 0">
+              <div class="stat-item">
+                <mat-icon>swap_horiz</mat-icon>
+                <div>
+                  <small>Transactions</small>
+                  <strong>{{ beneficiary.totalTransactions }}</strong>
+                </div>
+              </div>
+              <div class="stat-item">
+                <mat-icon>account_balance_wallet</mat-icon>
+                <div>
+                  <small>Total Amount</small>
+                  <strong>{{ formatCurrency(beneficiary.totalAmount) }}</strong>
+                </div>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <div>
+                  <small>Last Transaction</small>
+                  <strong>{{ formatDate(beneficiary.lastTransactionDate) }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                (click)="sendMoneyToBeneficiary(beneficiary)"
+              >
+                <mat-icon>send</mat-icon>
+                Send Money
+              </button>
+
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="editBeneficiary(beneficiary)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="deleteBeneficiary(beneficiary)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </div>
+
+            <div class="created-date">
+              <small>Added on {{ formatDate(beneficiary.createdAt) }}</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

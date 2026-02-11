@@ -1,0 +1,363 @@
+// Dashboard Container - Centers content with padding
+.dashboard-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e3e9f0 100%);
+  padding: 30px;
+}
+
+.dashboard-content {
+  margin: 0 auto;
+  width: 100%;
+}
+
+// Dashboard Header with Profile Button
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 0 8px;
+
+  .welcome-section {
+    flex: 1;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 0 0 4px;
+    }
+
+    .welcome-subtitle {
+      font-size: 14px;
+      color: #718096;
+      margin: 0;
+    }
+  }
+
+  .profile-button {
+    background: #ffffff;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &:hover {
+      background: #f7fafc;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Account Card
+.account-card {
+  margin-bottom: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  ::ng-deep {
+    .mat-mdc-card-header {
+      padding: 16px;
+    }
+
+    .mat-mdc-card-title {
+      color: white;
+      font-size: 18px;
+    }
+
+    .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .balance-display {
+    padding: 24px 16px;
+
+    .balance-amount {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .account-number {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  }
+
+  .account-status {
+    padding: 0 16px 16px;
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      font-size: 12px;
+      font-weight: 500;
+
+      &.active {
+        background: rgba(76, 175, 80, 0.3);
+      }
+    }
+  }
+}
+
+// Loading State
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  min-height: 200px;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #718096;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// Quick Actions Section
+.quick-actions-section {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #2d3748;
+  }
+
+  .quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+
+    .action-card {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      mat-card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+        text-align: center;
+
+        .action-icon {
+          font-size: 48px;
+          width: 48px;
+          height: 48px;
+          margin-bottom: 12px;
+        }
+
+        .action-label {
+          font-weight: 500;
+          color: #2d3748;
+        }
+      }
+    }
+  }
+}
+
+// Transactions Section
+.transactions-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 0;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+
+  .transactions-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    mat-list-item {
+      padding: 16px 0;
+
+      .mat-icon {
+        border-radius: 50%;
+        padding: 8px;
+
+        &.credit {
+          background: rgba(76, 175, 80, 0.1);
+          color: #4caf50;
+        }
+
+        &.debit {
+          background: rgba(244, 67, 54, 0.1);
+          color: #f44336;
+        }
+      }
+
+      .credit-amount {
+        color: #4caf50;
+        font-weight: 600;
+      }
+
+      .debit-amount {
+        color: #f44336;
+        font-weight: 600;
+      }
+    }
+
+    .no-transactions {
+      text-align: center;
+      padding: 48px 24px;
+      color: #718096;
+
+      mat-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        opacity: 0.3;
+      }
+
+      p {
+        margin-top: 16px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1440px) {
+  .dashboard-content {
+    max-width: 1200px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+
+  .dashboard-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    padding: 0;
+    margin-bottom: 24px;
+
+    .welcome-section {
+      h1 {
+        font-size: 22px;
+      }
+
+      .welcome-subtitle {
+        font-size: 13px;
+      }
+    }
+
+    .profile-button {
+      width: 40px;
+      height: 40px;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+  }
+
+  .account-card {
+    .balance-display {
+      .balance-amount {
+        font-size: 32px;
+      }
+    }
+  }
+
+  .quick-actions-section {
+    .quick-actions-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    .welcome-section {
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .profile-button {
+      width: 36px;
+      height: 36px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .account-card {
+    .balance-display {
+      .balance-amount {
+        font-size: 28px;
+      }
+    }
+  }
+}

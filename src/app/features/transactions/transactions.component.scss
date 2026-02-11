@@ -1,0 +1,268 @@
+.transactions-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+}
+
+.transactions-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  color: white;
+
+  .back-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .header-text {
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 4px 0 0;
+    }
+  }
+}
+
+// Filters Card
+.filters-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .filters-form {
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      button {
+        min-width: 140px;
+      }
+    }
+  }
+}
+
+// Transactions Card
+.transactions-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+
+    mat-spinner {
+      margin-bottom: 16px;
+    }
+
+    p {
+      color: #718096;
+      font-size: 14px;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .transactions-table {
+    width: 100%;
+
+    th {
+      background: #f7fafc;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 16px 12px;
+    }
+
+    .date-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: #718096;
+      }
+
+      span {
+        font-size: 14px;
+      }
+    }
+
+    mat-chip {
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 16px;
+
+      &.credit {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      &.debit {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .ref-code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: #f7fafc;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #4a5568;
+    }
+
+    .amount-header {
+      text-align: right;
+    }
+
+    .amount-cell {
+      text-align: right;
+      font-weight: 600;
+      font-size: 15px;
+
+      .credit-amount {
+        color: #059669;
+      }
+
+      .debit-amount {
+        color: #dc2626;
+      }
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+
+      &.success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      &.pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      &.failed {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    }
+
+    .transaction-row {
+      &:hover {
+        background: #f7fafc;
+      }
+    }
+  }
+
+  .no-transactions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    color: #718096;
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      opacity: 0.3;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+
+    p {
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    .header-text h1 {
+      font-size: 24px;
+    }
+  }
+
+  .filters-card .filters-form {
+    .filters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  .transactions-table {
+    font-size: 13px;
+
+    td {
+      padding: 12px 8px;
+    }
+  }
+}

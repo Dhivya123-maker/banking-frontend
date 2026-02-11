@@ -1,0 +1,397 @@
+.cards-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+}
+
+.cards-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Page Header
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  color: white;
+
+  .back-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .header-text {
+    flex: 1;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 4px 0 0;
+    }
+  }
+
+  .add-card-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// Add Card Form
+.add-card-form {
+  margin-bottom: 24px;
+  border-radius: 12px;
+
+  mat-card-header {
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .full-width {
+      flex: 1;
+    }
+
+    .half-width {
+      flex: 1;
+    }
+
+    .third-width {
+      flex: 1;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 12px;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #718096;
+  }
+}
+
+// No Cards
+.no-cards {
+  text-align: center;
+  padding: 60px 24px;
+  background: white;
+  border-radius: 12px;
+
+  mat-icon {
+    font-size: 27px;
+    width: 64px;
+    height: 64px;
+    color: #cbd5e0;
+    margin-top: 35px;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+
+  p {
+    color: #718096;
+    margin: 0 0 24px;
+  }
+}
+
+// Cards Grid
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.card-item {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  &.primary {
+    border: 2px solid #fbbf24;
+  }
+}
+
+// Card Visual
+.card-visual {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+  color: white;
+  position: relative;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &.debit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  &.credit {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  &.prepaid {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .card-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    mat-chip {
+      font-size: 11px;
+      min-height: 24px;
+
+      &.active {
+        background: rgba(16, 185, 129, 0.3);
+        color: white;
+      }
+
+      &.blocked {
+        background: rgba(239, 68, 68, 0.3);
+        color: white;
+      }
+    }
+  }
+
+  .card-number {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin: 20px 0;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+
+    small {
+      display: block;
+      font-size: 10px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    strong {
+      font-size: 14px;
+    }
+  }
+
+  .card-type-badge {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .primary-badge {
+    position: absolute;
+    top: 24px;
+    right: 116px;
+    background: rgba(251, 191, 36, 0.9);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Card Details
+mat-card-content {
+  padding: 20px;
+}
+
+.card-limits {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+
+  .limit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+
+    mat-icon {
+      color: #667eea;
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+
+      small {
+        font-size: 12px;
+        color: #718096;
+      }
+
+      strong {
+        font-size: 16px;
+        color: #2d3748;
+      }
+    }
+  }
+}
+
+.card-settings {
+  margin: 16px 0;
+
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+
+    .setting-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      mat-icon {
+        color: #718096;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      span {
+        font-size: 14px;
+        color: #2d3748;
+      }
+    }
+  }
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .cards-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+
+    .header-text h1 {
+      font-size: 24px;
+    }
+
+    .add-card-button {
+      width: 100%;
+      margin-top: 12px;
+    }
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-card-form {
+    .form-row {
+      flex-direction: column;
+    }
+  }
+}
+
+// Snackbar Styles
+::ng-deep {
+  .success-snackbar {
+    background: #10b981 !important;
+    color: white !important;
+  }
+
+  .error-snackbar {
+    background: #ef4444 !important;
+    color: white !important;
+  }
+}

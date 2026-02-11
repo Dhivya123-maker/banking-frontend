@@ -1,0 +1,144 @@
+<div class="send-money-container">
+  <div class="send-money-card">
+    <mat-card>
+      <mat-card-header>
+        <div class="header-content">
+          <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div class="header-text">
+            <mat-card-title>Send Money</mat-card-title>
+            <mat-card-subtitle>Transfer funds to another account</mat-card-subtitle>
+          </div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Current Balance Display -->
+        <div class="balance-info">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div class="balance-text">
+            <span class="balance-label">Available Balance</span>
+            <span class="balance-amount">{{ formatCurrency(currentBalance) }}</span>
+          </div>
+        </div>
+
+        <!-- Send Money Form -->
+        <form [formGroup]="sendMoneyForm" (ngSubmit)="onSubmit()" class="send-money-form">
+          
+          <!-- Account Number -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Recipient Account Number</mat-label>
+            <input 
+              matInput 
+              formControlName="toAccountNumber"
+              placeholder="Enter 16-digit account number"
+              maxlength="16"
+              type="text"
+            >
+            <mat-icon matPrefix>account_balance</mat-icon>
+            <mat-hint>16-digit account number</mat-hint>
+            <mat-error *ngIf="sendMoneyForm.get('toAccountNumber')?.touched">
+              {{ getErrorMessage('toAccountNumber') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Amount -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Amount</mat-label>
+            <input 
+              matInput 
+              formControlName="amount"
+              placeholder="Enter amount"
+              type="number"
+              min="1"
+              max="100000"
+            >
+            <span matPrefix>₹&nbsp;</span>
+            <mat-hint>Maximum: ₹1,00,000</mat-hint>
+            <mat-error *ngIf="sendMoneyForm.get('amount')?.touched">
+              {{ getErrorMessage('amount') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <input 
+              matInput 
+              formControlName="description"
+              placeholder="What's this for?"
+              maxlength="100"
+            >
+            <mat-icon matPrefix>description</mat-icon>
+            <mat-hint>e.g., Rent payment, Gift, etc.</mat-hint>
+            <mat-error *ngIf="sendMoneyForm.get('description')?.touched">
+              {{ getErrorMessage('description') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- MPIN -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Enter MPIN</mat-label>
+            <input 
+              matInput 
+              formControlName="mpin"
+              placeholder="Enter 6-digit MPIN"
+              [type]="hidePin ? 'password' : 'text'"
+              maxlength="6"
+            >
+            <mat-icon matPrefix>lock</mat-icon>
+            <button 
+              mat-icon-button 
+              matSuffix 
+              type="button"
+              (click)="hidePin = !hidePin"
+              [attr.aria-label]="'Hide MPIN'"
+            >
+              <mat-icon>{{ hidePin ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-hint>Required to confirm transaction</mat-hint>
+            <mat-error *ngIf="sendMoneyForm.get('mpin')?.touched">
+              {{ getErrorMessage('mpin') }}
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button 
+              mat-raised-button 
+              type="button"
+              (click)="goBack()"
+              class="cancel-button"
+              [disabled]="loading"
+            >
+              Cancel
+            </button>
+            
+            <button 
+              mat-raised-button 
+              color="primary"
+              type="submit"
+              class="submit-button"
+              [disabled]="loading || sendMoneyForm.invalid"
+            >
+              <mat-spinner 
+                diameter="20" 
+                *ngIf="loading"
+                class="button-spinner"
+              ></mat-spinner>
+              <span *ngIf="!loading">Send Money</span>
+              <span *ngIf="loading">Processing...</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Security Notice -->
+        <div class="security-notice">
+          <mat-icon>security</mat-icon>
+          <span>All transactions are secure and encrypted</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

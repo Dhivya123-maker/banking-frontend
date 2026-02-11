@@ -1,0 +1,361 @@
+<div class="bill-payments-container">
+  <div class="bill-payments-wrapper">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>Bill Payments</h1>
+        <p>Pay your utility bills and recharge</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="bill-tabs">
+      
+      <!-- Tab 1: Select Biller -->
+      <mat-tab label="Select Biller">
+        <div class="tab-content">
+          
+          <!-- Search Bar -->
+          <div class="search-section">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search billers</mat-label>
+              <input 
+                matInput 
+                [(ngModel)]="searchTerm"
+                (keyup)="searchBillers()"
+                placeholder="Search by name..."
+              >
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Categories -->
+          <div class="categories-section">
+            <h3>Categories</h3>
+            <div class="categories-grid">
+              <button 
+                mat-button 
+                *ngFor="let category of categories"
+                [class.active]="selectedCategory === category.value"
+                (click)="filterByCategory(category.value)"
+                class="category-chip"
+              >
+                <mat-icon>{{ category.icon }}</mat-icon>
+                <span>{{ category.label }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Saved Billers -->
+          <div class="saved-billers-section" *ngIf="savedBillers.length > 0">
+            <h3>Saved Billers</h3>
+            <div class="saved-billers-grid">
+              <mat-card *ngFor="let savedBiller of savedBillers" class="saved-biller-card">
+                <mat-card-content>
+                  <div class="saved-biller-header">
+                    <div class="saved-biller-info">
+                      <mat-icon>{{ getCategoryIcon(savedBiller.billerCategory) }}</mat-icon>
+                      <div>
+                        <strong>{{ savedBiller.nickname || savedBiller.billerName }}</strong>
+                        <small>{{ savedBiller.consumerNumber }}</small>
+                      </div>
+                    </div>
+                    <button 
+                      mat-icon-button 
+                      (click)="removeSavedBiller(savedBiller)"
+                      class="remove-button"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="selectSavedBiller(savedBiller)"
+                    class="pay-button"
+                  >
+                    Pay Now
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div *ngIf="loading" class="loading-container">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Loading billers...</p>
+          </div>
+
+          <!-- Billers List -->
+          <div class="billers-section" *ngIf="!loading">
+            <h3>All Billers</h3>
+            <div class="billers-grid" *ngIf="filteredBillers.length > 0">
+              <mat-card *ngFor="let biller of filteredBillers" class="biller-card">
+                <mat-card-content>
+                  <div class="biller-header">
+                    <mat-icon class="biller-icon">{{ getCategoryIcon(biller.billerCategory) }}</mat-icon>
+                    <div class="biller-info">
+                      <strong>{{ biller.billerName }}</strong>
+                      <small>{{ biller.billerCategory.replace('_', ' ') }}</small>
+                    </div>
+                  </div>
+                  <div class="biller-details">
+                    <div class="detail-item">
+                      <mat-icon>account_balance_wallet</mat-icon>
+                      <span>{{ formatCurrency(biller.minAmount) }} - {{ formatCurrency(biller.maxAmount) }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="biller.convenienceFee > 0">
+                      <mat-icon>paid</mat-icon>
+                      <span>Fee: {{ formatCurrency(biller.convenienceFee) }}</span>
+                    </div>
+                  </div>
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="selectBiller(biller)"
+                    class="select-button"
+                  >
+                    Select
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- No Billers -->
+            <div *ngIf="filteredBillers.length === 0" class="no-billers">
+              <mat-icon>search_off</mat-icon>
+              <h3>No billers found</h3>
+              <p>Try a different search or category</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Payment Form -->
+      <mat-tab label="Pay Bill">
+        <div class="tab-content">
+          
+          <!-- Selected Biller Info -->
+          <mat-card class="selected-biller-card" *ngIf="selectedBiller">
+            <mat-card-content>
+              <div class="selected-biller-header">
+                <mat-icon>{{ getCategoryIcon(selectedBiller.billerCategory) }}</mat-icon>
+                <div>
+                  <strong>{{ selectedBiller.billerName }}</strong>
+                  <small>{{ selectedBiller.billerCategory.replace('_', ' ') }}</small>
+                </div>
+              </div>
+              <div class="biller-limits">
+                <mat-chip>Min: {{ formatCurrency(selectedBiller.minAmount) }}</mat-chip>
+                <mat-chip>Max: {{ formatCurrency(selectedBiller.maxAmount) }}</mat-chip>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Payment Form -->
+          <mat-card class="payment-form-card" *ngIf="selectedBiller">
+            <mat-card-header>
+              <mat-card-title>Payment Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <form [formGroup]="payBillForm" (ngSubmit)="payBill()">
+                
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{ selectedBiller.consumerNumberLabel || 'Consumer Number' }}</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="consumerNumber"
+                    placeholder="Enter number"
+                  >
+                  <mat-icon matPrefix>confirmation_number</mat-icon>
+                  <mat-error *ngIf="payBillForm.get('consumerNumber')?.hasError('required')">
+                    Consumer number is required
+                  </mat-error>
+                  <mat-error *ngIf="payBillForm.get('consumerNumber')?.hasError('minlength')">
+                    Minimum 5 characters required
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Amount</mat-label>
+                  <span matPrefix>₹&nbsp;</span>
+                  <input 
+                    matInput 
+                    formControlName="amount"
+                    type="number"
+                    placeholder="Enter amount"
+                  >
+                  <mat-icon matPrefix>payments</mat-icon>
+                  <mat-hint>Min: {{ formatCurrency(selectedBiller.minAmount) }} | Max: {{ formatCurrency(selectedBiller.maxAmount) }}</mat-hint>
+                  <mat-error *ngIf="payBillForm.get('amount')?.hasError('required')">
+                    Amount is required
+                  </mat-error>
+                  <mat-error *ngIf="payBillForm.get('amount')?.hasError('min')">
+                    Amount must be greater than 0
+                  </mat-error>
+                </mat-form-field>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Bill Month (Optional)</mat-label>
+                    <mat-select formControlName="billMonth">
+                      <mat-option value="">None</mat-option>
+                      <mat-option *ngFor="let month of months" [value]="month">
+                        {{ month }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-icon matPrefix>calendar_today</mat-icon>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Bill Year (Optional)</mat-label>
+                    <mat-select formControlName="billYear">
+                      <mat-option *ngFor="let year of years" [value]="year">
+                        {{ year }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>MPIN</mat-label>
+                  <input 
+                    matInput 
+                    formControlName="mpin"
+                    type="password"
+                    maxlength="6"
+                    placeholder="Enter 6-digit MPIN"
+                  >
+                  <mat-icon matPrefix>lock</mat-icon>
+                  <mat-error *ngIf="payBillForm.get('mpin')?.hasError('required')">
+                    MPIN is required
+                  </mat-error>
+                  <mat-error *ngIf="payBillForm.get('mpin')?.hasError('pattern')">
+                    MPIN must be 6 digits
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-divider></mat-divider>
+
+                <div class="save-biller-section">
+                  <mat-checkbox formControlName="saveBiller">
+                    Save this biller for future payments
+                  </mat-checkbox>
+
+                  <mat-form-field 
+                    appearance="outline" 
+                    class="full-width"
+                    *ngIf="payBillForm.get('saveBiller')?.value"
+                  >
+                    <mat-label>Nickname (Optional)</mat-label>
+                    <input 
+                      matInput 
+                      formControlName="nickname"
+                      placeholder="e.g., Home Electricity"
+                    >
+                    <mat-icon matPrefix>label</mat-icon>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-button type="button" (click)="resetForm()">
+                    Cancel
+                  </button>
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    type="submit"
+                    [disabled]="submitting || payBillForm.invalid"
+                  >
+                    <mat-spinner diameter="20" *ngIf="submitting"></mat-spinner>
+                    <span *ngIf="!submitting">Pay {{ formatCurrency(payBillForm.get('amount')?.value || 0) }}</span>
+                    <span *ngIf="submitting">Processing...</span>
+                  </button>
+                </div>
+              </form>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- No Biller Selected -->
+          <div *ngIf="!selectedBiller" class="no-biller-selected">
+            <mat-icon>receipt_long</mat-icon>
+            <h3>No Biller Selected</h3>
+            <p>Please select a biller from the list to continue</p>
+            <button mat-raised-button color="primary" (click)="selectedTabIndex = 0">
+              Select Biller
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab 3: Payment History -->
+      <mat-tab label="History">
+        <div class="tab-content">
+          
+          <!-- Loading -->
+          <div *ngIf="loading" class="loading-container">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>Loading history...</p>
+          </div>
+
+          <!-- No History -->
+          <div *ngIf="!loading && paymentHistory.length === 0" class="no-history">
+            <mat-icon>history</mat-icon>
+            <h3>No Payment History</h3>
+            <p>Your bill payments will appear here</p>
+          </div>
+
+          <!-- Payment History List -->
+          <div class="history-list" *ngIf="!loading && paymentHistory.length > 0">
+            <mat-card *ngFor="let payment of paymentHistory" class="history-card">
+              <mat-card-content>
+                <div class="history-header">
+                  <div class="history-info">
+                    <mat-icon>{{ getCategoryIcon(payment.billerCategory) }}</mat-icon>
+                    <div>
+                      <strong>{{ payment.billerName }}</strong>
+                      <small>{{ payment.consumerNumber }}</small>
+                    </div>
+                  </div>
+                  <mat-chip [class]="getPaymentStatusClass(payment.paymentStatus)">
+                    {{ payment.paymentStatus }}
+                  </mat-chip>
+                </div>
+
+                <div class="history-details">
+                  <div class="detail-row">
+                    <span class="label">Amount:</span>
+                    <strong class="amount">{{ formatCurrency(payment.amount) }}</strong>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Date:</span>
+                    <span>{{ formatDate(payment.paidDate) }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="label">Reference:</span>
+                    <span>{{ payment.referenceNumber }}</span>
+                  </div>
+                  <div class="detail-row" *ngIf="payment.billMonth">
+                    <span class="label">Bill Period:</span>
+                    <span>{{ payment.billMonth }} {{ payment.billYear }}</span>
+                  </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="history-footer">
+                  <small>Transaction ID: {{ payment.transactionId }}</small>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

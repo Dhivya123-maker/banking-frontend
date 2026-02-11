@@ -1,0 +1,122 @@
+<div class="login-container">
+  <div class="login-card-wrapper">
+    <mat-card class="login-card">
+      <mat-card-header>
+        <div class="logo-container">
+          <mat-icon class="logo-icon">account_balance</mat-icon>
+        </div>
+        <mat-card-title>Welcome Back</mat-card-title>
+        <mat-card-subtitle>Sign in to your bank account</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <!-- Mobile Number -->
+         <mat-form-field appearance="outline" class="full-width">
+  <mat-label>Mobile Number</mat-label>
+  <input 
+    matInput 
+    formControlName="mobileNumber"
+    placeholder="Enter 10-digit mobile number"
+    maxlength="10"
+    type="tel"
+    [class.is-invalid]="submitted && f['mobileNumber'].errors"
+  >
+  <mat-icon matPrefix>phone</mat-icon>
+  <mat-error *ngIf="f['mobileNumber'].errors?.['required']">
+    Mobile number is required
+  </mat-error>
+  <mat-error *ngIf="f['mobileNumber'].errors?.['pattern']">
+    Mobile must start with 6, 7, 8, or 9 and be 10 digits
+  </mat-error>
+  <mat-hint>e.g., 9876543210</mat-hint>
+</mat-form-field>
+
+          <!-- MPIN -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>MPIN</mat-label>
+            <input 
+              matInput 
+              formControlName="mpin"
+              [type]="hidePassword ? 'password' : 'text'"
+              placeholder="Enter 6-digit MPIN"
+              maxlength="6"
+              [class.is-invalid]="submitted && f['mpin'].errors"
+            >
+            <mat-icon matPrefix>lock</mat-icon>
+            <button 
+              mat-icon-button 
+              matSuffix 
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword"
+            >
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="f['mpin'].errors?.['required']">
+              MPIN is required
+            </mat-error>
+            <mat-error *ngIf="f['mpin'].errors?.['minlength'] || f['mpin'].errors?.['maxlength']">
+              MPIN must be exactly 6 digits
+            </mat-error>
+            <mat-error *ngIf="f['mpin'].errors?.['pattern']">
+              MPIN must contain only numbers
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="error-message">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <!-- Forgot MPIN Link -->
+          <div class="forgot-mpin">
+            <a routerLink="/auth/forgot-mpin">Forgot MPIN?</a>
+          </div>
+
+          <!-- Login Button -->
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            class="login-button full-width"
+            [disabled]="loading"
+          >
+            <mat-spinner 
+              *ngIf="loading" 
+              diameter="20" 
+              class="button-spinner"
+            ></mat-spinner>
+            <span *ngIf="!loading">Login</span>
+          </button>
+
+          <!-- Register Link -->
+          <div class="register-link">
+            <p>
+              Don't have an account? 
+              <a routerLink="/auth/register">Register here</a>
+            </p>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Features Section -->
+    <div class="features-section">
+      <div class="feature">
+        <mat-icon>security</mat-icon>
+        <p>Secure Banking</p>
+      </div>
+      <div class="feature">
+        <mat-icon>speed</mat-icon>
+        <p>Fast Transactions</p>
+      </div>
+      <div class="feature">
+        <mat-icon>support_agent</mat-icon>
+        <p>24/7 Support</p>
+      </div>
+    </div>
+  </div>
+</div>

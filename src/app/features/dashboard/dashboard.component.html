@@ -1,0 +1,100 @@
+<div class="dashboard-container">
+  <div class="dashboard-content">
+    
+    <!-- Dashboard Header with Profile Button -->
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1>Welcome back, {{ user?.fullName }}!</h1>
+        <p class="welcome-subtitle">Here's what's happening with your account today</p>
+      </div>
+      
+      <!-- Profile Button -->
+      <button mat-icon-button class="profile-button" (click)="navigateToProfile()">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </div>
+
+    <!-- Account Summary Card -->
+    <mat-card class="account-card" *ngIf="!loading && account">
+      <mat-card-header>
+        <mat-card-title>Account Balance</mat-card-title>
+        <mat-card-subtitle>{{ account.accountType }} Account</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="balance-display">
+          <div class="balance-amount">{{ formatCurrency(account.balance) }}</div>
+          <div class="account-number">A/C: {{ account.accountNumber }}</div>
+        </div>
+        <div class="account-status">
+          <span class="status-badge" [class.active]="account.accountStatus === 'ACTIVE'">
+            {{ account.accountStatus }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Loading State -->
+    <mat-card class="account-card" *ngIf="loading">
+      <mat-card-content class="loading-content">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading account details...</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <h2>Quick Actions</h2>
+      <div class="quick-actions-grid">
+        <mat-card 
+          *ngFor="let action of quickActions" 
+          class="action-card"
+          (click)="onQuickAction(action.action)"
+        >
+          <mat-card-content>
+            <mat-icon [color]="action.color" class="action-icon">{{ action.icon }}</mat-icon>
+            <div class="action-label">{{ action.label }}</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="transactions-section">
+      <div class="section-header">
+        <h2>Recent Transactions</h2>
+        <button mat-button color="primary" (click)="navigateTo('/transactions')">
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <mat-card class="transactions-card">
+        <mat-card-content>
+          <mat-list *ngIf="recentTransactions.length > 0; else noTransactions">
+            <mat-list-item *ngFor="let txn of recentTransactions; let last = last">
+              <mat-icon matListItemIcon [class]="getTransactionClass(txn.transactionType)">
+                {{ getTransactionIcon(txn.transactionType) }}
+              </mat-icon>
+              <div matListItemTitle>{{ txn.description }}</div>
+              <div matListItemLine>{{ formatDate(txn.createdAt) }} • {{ txn.transactionRef }}</div>
+              <span matListItemMeta 
+                    [class.credit-amount]="isCredit(txn.transactionType)" 
+                    [class.debit-amount]="!isCredit(txn.transactionType)">
+                {{ isCredit(txn.transactionType) ? '+' : '-' }}{{ formatCurrency(txn.amount) }}
+              </span>
+              <mat-divider *ngIf="!last"></mat-divider>
+            </mat-list-item>
+          </mat-list>
+
+          <ng-template #noTransactions>
+            <div class="no-transactions">
+              <mat-icon>receipt_long</mat-icon>
+              <p>No transactions yet</p>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+</div>

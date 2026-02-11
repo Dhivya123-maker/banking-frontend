@@ -1,0 +1,138 @@
+<div class="statement-container">
+  <div class="statement-card">
+    <mat-card>
+      <mat-card-header>
+        <div class="header-content">
+          <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div class="header-text">
+            <mat-card-title>Download Statement</mat-card-title>
+            <mat-card-subtitle>Generate and download your account statement</mat-card-subtitle>
+          </div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Info Banner -->
+        <div class="info-banner">
+          <mat-icon>info</mat-icon>
+          <div class="info-text">
+            <strong>Account Statement</strong>
+            <p>Download a PDF statement of your transactions for the selected date range.</p>
+          </div>
+        </div>
+
+        <!-- Quick Range Buttons -->
+        <div class="quick-range-section">
+          <h3>Quick Select:</h3>
+          <div class="quick-range-buttons">
+            <button mat-stroked-button (click)="setQuickRange(1)">
+              <mat-icon>event</mat-icon>
+              Last Month
+            </button>
+            <button mat-stroked-button (click)="setQuickRange(3)">
+              <mat-icon>date_range</mat-icon>
+              Last 3 Months
+            </button>
+            <button mat-stroked-button (click)="setQuickRange(6)">
+              <mat-icon>calendar_today</mat-icon>
+              Last 6 Months
+            </button>
+            <button mat-stroked-button (click)="setQuickRange(12)">
+              <mat-icon>today</mat-icon>
+              Last Year
+            </button>
+          </div>
+        </div>
+
+        <!-- Date Selection Form -->
+        <form [formGroup]="statementForm" class="statement-form">
+          <div class="date-fields">
+            <!-- Start Date -->
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Start Date</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="startPicker" 
+                formControlName="startDate"
+                [max]="maxDate"
+                [min]="minDate"
+                required
+              >
+              <mat-datepicker-toggle matPrefix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-icon matSuffix>calendar_today</mat-icon>
+              <mat-error *ngIf="statementForm.get('startDate')?.hasError('required')">
+                Start date is required
+              </mat-error>
+            </mat-form-field>
+
+            <!-- End Date -->
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>End Date</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="endPicker" 
+                formControlName="endDate"
+                [max]="maxDate"
+                [min]="minDate"
+                required
+              >
+              <mat-datepicker-toggle matPrefix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+              <mat-icon matSuffix>calendar_today</mat-icon>
+              <mat-error *ngIf="statementForm.get('endDate')?.hasError('required')">
+                End date is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Download Button -->
+          <div class="action-section">
+            <button 
+              mat-raised-button 
+              color="primary"
+              type="button"
+              (click)="downloadStatement()"
+              [disabled]="loading || statementForm.invalid"
+              class="download-button"
+            >
+              <mat-spinner 
+                diameter="20" 
+                *ngIf="loading"
+                class="button-spinner"
+              ></mat-spinner>
+              <mat-icon *ngIf="!loading">download</mat-icon>
+              <span *ngIf="!loading">Download PDF Statement</span>
+              <span *ngIf="loading">Generating PDF...</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Features List -->
+        <div class="features-section">
+          <h3>Statement Includes:</h3>
+          <div class="features-list">
+            <div class="feature-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>Account details and summary</span>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>All transactions in selected period</span>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>Opening and closing balance</span>
+            </div>
+            <div class="feature-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>Transaction reference numbers</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
